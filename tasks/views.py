@@ -1,8 +1,9 @@
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.exceptions import NotAuthenticated
+from rest_framework.exceptions import NotAuthenticated, PermissionDenied
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework import status
 
@@ -56,10 +57,16 @@ class ToggleCompletedOrNot(APIView):
     def put(self, request, id):
         task = get_object_or_404(Task, id=id)
 
-        if not request.user == task.user:
-            raise NotAuthenticated
+        if task.user != request.user:
+            raise PermissionDenied
 
         task.is_completed = not task.is_completed
+
+        if task.is_completed:
+            task.completed_at = timezone.now()
+        else:
+            task.completed_at = None
+
         task.save()
 
         return Response(status=status.HTTP_200_OK)
