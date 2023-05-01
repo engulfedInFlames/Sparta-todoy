@@ -24,7 +24,7 @@ class Users(APIView):
             many=True,
         )
 
-        return Response(serializer.dataa, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class Me(APIView):
@@ -57,22 +57,12 @@ class Me(APIView):
 
 
 class Signup(APIView):
-    """
     def get(self, request):
         if request.user.is_authenticated:
-            return redirect("/")
+            return Response(
+                {"Access Denied": "Authenticated user can not access 'Signup' page."}
+            )
 
-        form = SignupForm()
-        url = request.get_full_path()
-        context = {
-            "form": form,
-            "url": url,
-        }
-
-        return render(request, "users/signup.html", context=context)
-    """
-
-    def get(self, request):
         return Response(status=status.HTTP_200_OK)
 
     def post(self, request):
@@ -89,6 +79,11 @@ class Signup(APIView):
 
 class Login(APIView):
     def get(self, request):
+        if request.user.is_authenticated:
+            return Response(
+                {"Access Denied": "Authenticated user can not access 'Login' page."}
+            )
+
         return Response(status=status.HTTP_200_OK)
 
     def post(self, request):
@@ -106,6 +101,8 @@ class Login(APIView):
 
 
 class Logout(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         logout(request)
         return Response(status=status.HTTP_200_OK)

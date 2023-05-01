@@ -88,5 +88,5 @@ class CreateTask(APIView):
             list.tasks.add(task)
 
             return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
